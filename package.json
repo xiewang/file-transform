@@ -1,0 +1,17 @@
+{
+  "name": "file-transform",
+  "version": "1.0.0",
+  "description": "transform all the files from a folder while changing the files with custom rules to a new folder",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "xiewang",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "lodash": "^4.16.6",
+    "path": "^0.12.7",
+    "rimraf": "^2.5.4"
+  }
+}
