@@ -40,27 +40,38 @@ var migration = function(data,from) {
 
 		getData(v.folder+v.name).then(function(fileContent){
 				// data = handdleContent(data);
-				fs.writeFile(v.name,fileContent,function(){});
+				var fakeFolder = _.replace(v.folder, /\//g, '-');
+				fs.writeFile(fakeFolder+v.name,fileContent,function(){});
 
-				fs.createReadStream(v.name).pipe(fs.createWriteStream(sto+'/'+v.name));
-				rimraf(v.name, function(err){
-					// console.log('remove:'+err);
-				})
+
+				fs.existsAsync(sto+'/'+v.name).then(function(exists){
+			        if(exists){
+				    	rimraf(sto+'/'+v.name, function(err){})
+				    }
+				    return Promise.resolve(true);
+				}).then(function(res){
+					fs.createReadStream(fakeFolder+v.name).pipe(fs.createWriteStream(sto+'/'+v.name));
+					rimraf(fakeFolder+v.name, function(err){
+						// console.log('remove:'+err);
+					})
+				});
+
 		})
 
 	});
 	
 }
 
+fs.existsAsync = function(path){
+	return fs.openAsync(path, "r").then(function(stats){
+	return true
+	}).catch(function(stats){
+	return false
+	})
+}
+
 var getData = function(url){
 	url = url +'';	
-	fs.existsAsync = function(path){
-	  return fs.openAsync(path, "r").then(function(stats){
-	    return true
-	  }).catch(function(stats){
-	    return false
-	  })
-	}
 
 	return fs.existsAsync(url).then(function(exists){
         if(exists){
