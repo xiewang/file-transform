@@ -5,7 +5,7 @@ var util = require('util');
 var rimraf = require('rimraf');
 var  Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs')); 
-
+var rules = require('./rules.js')
 var _ = require('lodash');
 
 var handdleContent = function(data) {
@@ -39,7 +39,9 @@ var migration = function(data,from) {
 		}
 
 		getData(v.folder+v.name).then(function(fileContent){
-				// data = handdleContent(data);
+				// console.log(fileContent)
+				fileContent = rules(fileContent);
+
 				var fakeFolder = _.replace(v.folder, /\//g, '-');
 				fs.writeFile(fakeFolder+v.name,fileContent,function(){});
 
@@ -48,7 +50,13 @@ var migration = function(data,from) {
 			        if(exists){
 				    	rimraf(sto+'/'+v.name, function(err){})
 				    }
-				    return Promise.resolve(true);
+				    return Promise.resolve(function(){
+				    	if(exists){
+					    	rimraf(sto+'/'+v.name, function(err){})
+					    }
+				    }).then(function(){
+				    	return true;
+				    });
 				}).then(function(res){
 					fs.createReadStream(fakeFolder+v.name).pipe(fs.createWriteStream(sto+'/'+v.name));
 					rimraf(fakeFolder+v.name, function(err){
